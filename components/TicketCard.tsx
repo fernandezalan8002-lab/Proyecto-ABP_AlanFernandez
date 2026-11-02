@@ -1,6 +1,9 @@
 import React from "react";
 import styled from "styled-components/native";
+import { Ionicons } from "@expo/vector-icons";
 import { EstadoTicket, PrioridadTicket } from "../constants/types";
+import { coloresEstado, coloresPrioridad } from "../constants/theme";
+import Badge from "./Badge";
 
 // Componente reutilizable que representa UN ticket en el listado.
 // Toda la información se recibe por props: ningún dato queda
@@ -15,21 +18,9 @@ interface TicketCardProps {
   prioridad: PrioridadTicket;
   fecha: string;
   avatar: string;
+  tecnico?: string | null;
+  onPress?: () => void;
 }
-
-// Colores según el estado del ticket.
-const coloresEstado: Record<EstadoTicket, string> = {
-  Abierto: "#E74C3C",
-  "En proceso": "#F5A623",
-  Resuelto: "#27AE60",
-};
-
-// Colores según la prioridad del ticket.
-const coloresPrioridad: Record<PrioridadTicket, string> = {
-  Alta: "#E74C3C",
-  Media: "#F5A623",
-  Baja: "#7F8C8D",
-};
 
 export default function TicketCard({
   numero,
@@ -40,9 +31,16 @@ export default function TicketCard({
   prioridad,
   fecha,
   avatar,
+  tecnico,
+  onPress,
 }: TicketCardProps) {
   return (
-    <Card>
+    <Card
+      onPress={onPress}
+      activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={`Ticket ${numero}: ${titulo}`}
+    >
       <Avatar source={{ uri: avatar }} />
 
       <Info>
@@ -57,24 +55,36 @@ export default function TicketCard({
         </Solicitante>
 
         <FilaBadges>
-          <Badge color={coloresEstado[estado]}>
-            <BadgeTexto>{estado}</BadgeTexto>
-          </Badge>
-          <Badge color={coloresPrioridad[prioridad]}>
-            <BadgeTexto>Prioridad {prioridad}</BadgeTexto>
-          </Badge>
+          <Badge texto={estado} color={coloresEstado[estado]} />
+          <Badge texto={`Prioridad ${prioridad}`} color={coloresPrioridad[prioridad]} />
         </FilaBadges>
+
+        {/* Renderizado condicional: solo si tiene técnico asignado */}
+        {tecnico ? (
+          <FilaTecnico>
+            <Ionicons name="person-circle-outline" size={14} color="#52606D" />
+            <TextoTecnico>{tecnico}</TextoTecnico>
+          </FilaTecnico>
+        ) : null}
       </Info>
+
+      {onPress ? <Ionicons name="chevron-forward" size={18} color="#B0BAC5" /> : null}
     </Card>
   );
 }
 
-const Card = styled.View`
+const Card = styled.TouchableOpacity`
   flex-direction: row;
-  background-color: #ffffff;
-  border-radius: 14px;
+  align-items: center;
+  background-color: ${(props) => props.theme.colores.superficie};
+  border-radius: ${(props) => props.theme.radios.medio}px;
   padding: 14px;
   margin-bottom: 14px;
+  elevation: 2;
+  shadow-color: #000;
+  shadow-opacity: 0.06;
+  shadow-radius: 6px;
+  shadow-offset: 0px 2px;
 `;
 
 const Avatar = styled.Image`
@@ -82,6 +92,7 @@ const Avatar = styled.Image`
   height: 52px;
   border-radius: 26px;
   margin-right: 12px;
+  align-self: flex-start;
 `;
 
 const Info = styled.View`
@@ -97,40 +108,40 @@ const FilaSuperior = styled.View`
 const Numero = styled.Text`
   font-size: 12px;
   font-weight: bold;
-  color: #7f8c8d;
+  color: ${(props) => props.theme.colores.textoTenue};
 `;
 
 const Fecha = styled.Text`
   font-size: 12px;
-  color: #7f8c8d;
+  color: ${(props) => props.theme.colores.textoTenue};
 `;
 
 const Titulo = styled.Text`
   font-size: 15px;
   font-weight: bold;
-  color: #1e293b;
+  color: ${(props) => props.theme.colores.texto};
   margin-bottom: 4px;
 `;
 
 const Solicitante = styled.Text`
   font-size: 13px;
-  color: #52606d;
+  color: ${(props) => props.theme.colores.textoSecundario};
   margin-bottom: 10px;
 `;
 
 const FilaBadges = styled.View`
   flex-direction: row;
+  flex-wrap: wrap;
 `;
 
-const Badge = styled.View<{ color: string }>`
-  background-color: ${(props: { color: string }) => props.color};
-  border-radius: 20px;
-  padding: 4px 10px;
-  margin-right: 8px;
+const FilaTecnico = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-top: 8px;
 `;
 
-const BadgeTexto = styled.Text`
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: bold;
+const TextoTecnico = styled.Text`
+  font-size: 12px;
+  color: ${(props) => props.theme.colores.textoSecundario};
+  margin-left: 4px;
 `;
