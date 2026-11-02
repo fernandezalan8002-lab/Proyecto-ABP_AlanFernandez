@@ -49,7 +49,6 @@ export default function Home() {
       <Encabezado
         titulo="Hola, Alan"
         subtitulo="Mesa de Ayuda · Sistemas"
-        avatar="https://i.pravatar.cc/150?img=68"
       />
 
       <BarraBusqueda
